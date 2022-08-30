@@ -1,18 +1,25 @@
 require('mongoose');
 const Usr = require('../models/user');
 
-const addUser = async (name,lastname,email) => {
+
+const addUser = async (name,lastname,email,isActive,password) => {
 
     let existUser = await Usr.findOne({ email: email });
     console.log(existUser);
     if(!existUser) {
+
+        const cryptoPass = require('crypto')
+        .createHash('sha256')
+        .update(password)
+        .digest('hex');
         
         const usr = new Usr(
-            {
-                
+            {              
                 name: name,
                 lastname:lastname,
-                email: email
+                email: email,
+                isActive:isActive,
+                password:cryptoPass
             }
         );
 
@@ -49,4 +56,18 @@ const editUser = async(user) => {
     return result;
 }
 
-module.exports = { addUser, getAllUsers, getUser, editUser }
+const editRoles = async(roles,id) => {
+
+    const result = await Usr.findByIdAndUpdate(id,{$set:{roles:roles}},{new:true});
+
+    return result;
+}
+
+const deleteUser = async(id) => {
+
+    const result = await Usr.findByIdAndDelete(id);
+
+    return result;
+}
+
+module.exports = { addUser, getAllUsers, getUser, editUser, editRoles, deleteUser }
