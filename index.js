@@ -9,6 +9,8 @@ const uri = process.env.MONGO_URI;
 
 /******/
 const UsrController = require('./controllers/user');
+const AuthController = require('./controllers/auth');
+const Middleware = require('./middleware/auth-middleware');
 
 
 mongoose
@@ -34,7 +36,7 @@ app.post("/",(req,res) => {
 });
 
 // Get de todos los usuarios
-app.get("/users",async (req,res) =>{
+app.get("/users",Middleware.verify,async (req,res) =>{
 
   let limit = req.query.limit;
   let offset = req.query.offset;
@@ -141,6 +143,23 @@ app.put("/users/:id/roles",async (req,res) =>{
        res.status(500).send("Error");
     } 
 })
+
+app.post("/auth/login", async (req,res) => {
+
+    const email = req.body.email;
+    const password = req.body.password;
+    try{
+      const result = await AuthController.login(email,password);
+      if(result){
+        res.status(200).json(result);
+      }else{
+        res.status(401).send("No puede estar aqui")
+      }
+    }catch(error){
+        res.status(500).send("Error");
+    }  
+})
+
 
 http.listen(PORT, () => {
   console.log(`Listening to ${PORT}`);
