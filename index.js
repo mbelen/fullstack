@@ -11,6 +11,7 @@ const uri = process.env.MONGO_URI;
 const UsrController = require('./controllers/user');
 const AuthController = require('./controllers/auth');
 const Middleware = require('./middleware/auth-middleware');
+const MailController = require('./controllers/mail');
 
 
 mongoose
@@ -26,7 +27,8 @@ app.use(express.json());
 
 
 app.get("/", (req, res) => {
-  res.send("Hola estoy funcionando.");
+  //res.send("Hola estoy funcionando.");
+  res.status(200).json("Hola estoy funcionando.");
 });
 
 // GET - POST - DELETE - PUT - PATCH 
@@ -160,6 +162,8 @@ app.post("/auth/login", async (req,res) => {
     }  
 })
 
+/* Manda un mail */
+MailController.sendMail();
 
 http.listen(PORT, () => {
   console.log(`Listening to ${PORT}`);
